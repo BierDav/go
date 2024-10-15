@@ -367,13 +367,14 @@ func readCookies(h Header, filter string) []*Cookie {
 
 // validCookieDomain reports whether v is a valid cookie domain-value.
 func validCookieDomain(v string) bool {
-	if isCookieDomainName(v) {
-		return true
+	domains := strings.Split(v, ",")
+	for _, domain := range domains {
+		domain = strings.TrimSpace(domain)
+		if !isCookieDomainName(domain) && (net.ParseIP(domain) == nil || strings.Contains(domain, ":")) {
+			return false
+		}
 	}
-	if net.ParseIP(v) != nil && !strings.Contains(v, ":") {
-		return true
-	}
-	return false
+	return true
 }
 
 // validCookieExpires reports whether v is a valid cookie expires-value.
